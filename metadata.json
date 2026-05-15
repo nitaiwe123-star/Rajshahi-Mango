@@ -1,0 +1,10 @@
+{
+  "name": "রাজশাহীর ফ্রেশ আম",
+  "description": "একটি প্রিমিয়াম আম বিক্রয় কেন্দ্র। রাজশাহীর বাগান থেকে সরাসরি ফ্রেশ এবং কেমিক্যাল মুক্ত আম পৌঁছে দিচ্ছি আপনার দোরগোড়ায়।",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}

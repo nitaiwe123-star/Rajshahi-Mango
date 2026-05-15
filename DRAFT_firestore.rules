@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == "nitaiwe123@gmail.com"
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validations
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+             data.keys().size() <= 10 &&
+             data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.role in ['admin', 'user'];
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['name', 'regularPrice', 'stock']) &&
+             data.keys().size() <= 20 &&
+             data.name is string && data.name.size() <= 200 &&
+             data.regularPrice is number && data.regularPrice >= 0 &&
+             data.stock is number && data.stock >= 0;
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['customerName', 'customerPhone', 'customerAddress', 'items', 'total', 'status', 'paymentMethod']) &&
+             data.keys().size() <= 25 &&
+             data.customerName is string && data.customerName.size() <= 100 &&
+             data.customerPhone is string && data.customerPhone.size() <= 20 &&
+             data.customerAddress is string && data.customerAddress.size() <= 500 &&
+             data.items is list && data.items.size() > 0 &&
+             data.total is number && data.total >= 0 &&
+             data.status in ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] &&
+             data.paymentMethod in ['COD', 'bkash', 'nagad', 'rocket'];
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['productId', 'rating', 'comment', 'status']) &&
+             data.keys().size() <= 15 &&
+             data.productId is string && data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 2000 &&
+             data.status in ['pending', 'approved'];
+    }
+
+    // Rules for each collection
+
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) &&
+                    isValidUser(incoming()) &&
+                    incoming().uid == existing().uid &&
+                    (isAdmin() || !incoming().diff(existing()).affectedKeys().hasAny(['role']));
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidProduct(incoming());
+    }
+
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isValidOrder(incoming()) && (
+        (isSignedIn() && incoming().userId == request.auth.uid) ||
+        (!isSignedIn() && !incoming().keys().hasAny(['userId'])) // Guest checkout allowed as requested for FB ads
+      );
+      allow update: if isAdmin() && isValidOrder(incoming());
+      // No delete allowed for orders by default
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      allow create: if isSignedIn() && isValidReview(incoming()) && 
+                    incoming().status == 'pending' &&
+                    incoming().userId == request.auth.uid;
+      allow update: if isAdmin() && isValidReview(incoming());
+      allow delete: if isAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if true; // Needed for checkout validation
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
