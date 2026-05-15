@@ -55,6 +55,8 @@ export default function ProductGrid() {
                   src={product.image} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute top-6 left-6 flex flex-col gap-2">
                   <span className="bg-leaf-green text-white text-xs font-bold px-3 py-1 rounded-full">ফ্রেশ</span>

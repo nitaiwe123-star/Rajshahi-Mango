@@ -8,9 +8,11 @@ export default function Hero() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <img 
-          src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=2000" 
+          src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=70&w=1600" 
           className="w-full h-full object-cover"
           alt="Rajshahi Mango Orchard"
+          fetchPriority="high"
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-900/80 via-stone-900/40 to-transparent"></div>
       </div>

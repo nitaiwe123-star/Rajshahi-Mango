@@ -92,6 +92,41 @@
         "value": { "type": "any" }
       },
       "required": ["key", "value"]
+    },
+    "Banner": {
+      "title": "Banner",
+      "description": "Marketing banners and sliders",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "image": { "type": "string" },
+        "type": { "type": "string", "enum": ["slider", "offer"] },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "image", "type"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product categories",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "image": { "type": "string" },
+        "slug": { "type": "string" }
+      },
+      "required": ["name", "image"]
+    },
+    "Log": {
+      "title": "Log",
+      "description": "System activity logs",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "message": { "type": "string" },
+        "time": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "message", "time"]
     }
   },
   "firestore": {
@@ -122,6 +157,18 @@
     "admins/{userId}": {
       "schema": "User",
       "description": "Admin users"
+    },
+    "banners/{bannerId}": {
+      "schema": "Banner",
+      "description": "Site banners"
+    },
+    "categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Product categories"
+    },
+    "logs/{logId}": {
+      "schema": "Log",
+      "description": "Activity logs"
     }
   }
 }
