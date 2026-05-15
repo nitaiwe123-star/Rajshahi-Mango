@@ -19,13 +19,19 @@ export default function Login() {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        uid: user.uid,
-        email: user.email,
-        name: user.displayName || user.email.split('@')[0],
-        role: user.email === 'nitaiwe123@gmail.com' ? 'admin' : 'user',
-        createdAt: new Date().toISOString()
-      });
+      if (user.email === 'nitaiwe123@gmail.com') {
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || user.email.split('@')[0],
+          role: 'admin',
+          createdAt: new Date().toISOString()
+        });
+      } else {
+        setError('পাবলিক রেজিস্ট্রেশন বন্ধ আছে। আপনি লগইন করতে পারবেন না।');
+        await auth.signOut();
+        return;
+      }
     }
 
     if (user.email === 'nitaiwe123@gmail.com') {
@@ -165,10 +171,6 @@ export default function Login() {
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
           Google দিয়ে লগইন করুন
         </button>
-
-        <p className="mt-10 text-center text-sm text-stone-500">
-          নতুন ইউজার? <Link to="/register" className="text-leaf-green font-bold">একাউন্ট তৈরি করুন</Link>
-        </p>
       </motion.div>
     </div>
   );

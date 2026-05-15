@@ -13,7 +13,6 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const OrderTracking = lazy(() => import('./pages/OrderTracking'));
 const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
 const UserDashboard = lazy(() => import('./pages/UserDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -44,7 +43,6 @@ function AppContent() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/track" element={<OrderTracking />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
                 <Route path="/dashboard/*" element={<UserDashboard />} />
                 <Route path="/admin/*" element={<AdminDashboard />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
